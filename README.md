@@ -2,10 +2,6 @@
 
 Query Bedrock server status from PocketMine-MP with HTTP and UDP
 
-This is the renamed successor to `QueryServer`. The plugin name, Composer
-package, PHP namespace, virion metadata, examples, permissions and docs all
-use `BedrockQuery`. Update old `QueryServer` dependencies before installing it.
-
 [![CI](https://github.com/NhanAZ-Libraries/BedrockQuery/actions/workflows/build.yml/badge.svg)](https://github.com/NhanAZ-Libraries/BedrockQuery/actions/workflows/build.yml)
 [![Latest release](https://img.shields.io/github/v/release/NhanAZ-Libraries/BedrockQuery)](https://github.com/NhanAZ-Libraries/BedrockQuery/releases/latest)
 [![License](https://img.shields.io/github/license/NhanAZ-Libraries/BedrockQuery)](https://github.com/NhanAZ-Libraries/BedrockQuery/blob/master/LICENSE)

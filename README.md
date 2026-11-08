@@ -4,7 +4,7 @@ Query Bedrock server status from PocketMine-MP with HTTP and UDP
 
 This is the renamed successor to `QueryServer`. The plugin name, Composer
 package, PHP namespace, virion metadata, examples, permissions and docs all
-use `BedrockQuery`; update old `QueryServer` dependencies before installing it.
+use `BedrockQuery`. Update old `QueryServer` dependencies before installing it.
 
 [![CI](https://github.com/NhanAZ-Libraries/BedrockQuery/actions/workflows/build.yml/badge.svg)](https://github.com/NhanAZ-Libraries/BedrockQuery/actions/workflows/build.yml)
 [![Latest release](https://img.shields.io/github/v/release/NhanAZ-Libraries/BedrockQuery)](https://github.com/NhanAZ-Libraries/BedrockQuery/releases/latest)
@@ -46,13 +46,13 @@ Main::getInstance()->getApi()->query("example.org", 19132, function (array $resu
 });
 ```
 
-The [example consumer](examples/QueryConsumer) shows plugin dependency and command wiring. Its `/qtest [host] [port]` command accepts a separate host and UDP port for local testing; without arguments, it uses the public test server. A callback is delivered once after success or the final failure. Keep the callback lightweight because it runs when the asynchronous task completes on the server thread.
+The [example consumer](examples/QueryConsumer) shows plugin dependency and command wiring. Its `/qtest [host] [port]` command accepts a separate host and UDP port for local testing. Without arguments, it uses the public test server. A callback is delivered once after success or the final failure. Keep the callback lightweight because it runs when the asynchronous task completes on the server thread.
 
 ## Build and verify
 
-The [build workflow](.github/workflows/build.yml) runs PHPStan at maximum level, PHP lint, callback and loopback UDP fixtures, and DevTools PHAR builds for both the plugin and its example consumer. It verifies PHAR contents and SHA-256 digests before uploading the plugin artifact. The UDP fixture checks ping parsing and malformed replies against a local responder; it does not establish reachability of public servers. A CI artifact is a test result, not a stable release.
+The [build workflow](.github/workflows/build.yml) runs PHPStan at maximum level, PHP lint, callback and loopback UDP fixtures, and DevTools PHAR builds for both the plugin and its example consumer. It verifies PHAR contents and SHA-256 digests before uploading the plugin artifact. The UDP fixture checks ping parsing and malformed replies against a local responder. It does not establish reachability of public servers. A CI artifact is a test result, not a stable release.
 
-The repository also contains historical `virion.yml` and Poggit metadata. The public API currently depends on a loaded plugin instance, so the source should not be presented as a standalone virion. No current standalone virion release is offered.
+The public API currently depends on a loaded plugin instance, so the source should not be presented as a standalone virion. No current standalone virion release is offered.
 
 ## License and upstream
 

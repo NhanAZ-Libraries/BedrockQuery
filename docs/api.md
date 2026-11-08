@@ -53,13 +53,13 @@ The callback receives one normalized array. It is called once after a successful
 
 The port argument controls the initial transport.
 
-| Arguments | Transport | Behavior |
+| Arguments | Initial transport | Behavior |
 | --- | --- | --- |
-| `"example.org"`, `null` | HTTP, then UDP fallback | Requests the Bedrock status API first. It uses UDP when the API fails or reports the server offline. |
-| `"example.org:19132"`, `null` | UDP | Extracts the port from the host string and sends a direct UDP query. |
-| `"example.org"`, `19132` | UDP | Uses the explicit port and sends a direct UDP query. |
+| `"example.org"`, `null` | MCSRVSTAT HTTP | Requests the Bedrock status API first. When it fails or reports the server offline, it tries NetherNet and then legacy RakNet UDP on port `19132`. |
+| `"example.org:19132"`, `null` | MCSRVSTAT HTTP | The host string is passed to the status API. If that path fails or reports offline, the parsed host and port are used for NetherNet, then UDP. |
+| `"example.org"`, `19132` | NetherNet | Requests `https://example.org:19132/v1/join`, tries plain HTTP if HTTPS cannot be used, and falls back to UDP if both signaling requests fail. |
 
-An explicit port is useful when you want to avoid the HTTP status API. A missing port lets the plugin try the HTTP status API before falling back to UDP.
+An explicit port is useful when you want to query the server directly without MCSRVSTAT. The NetherNet request is a metadata/status request; it does not complete a client connection handshake.
 
 ## Callback results
 
@@ -109,6 +109,30 @@ When the query uses UDP or the HTTP request falls back to UDP, the callback has 
 
 The basic UDP response remains useful when the optional full query request fails. In that case, `queryError` contains the full query error while `ok` can still be `true`.
 
+### Successful NetherNet result
+
+When the NetherNet signaling endpoint accepts `GET /v1/join`, the callback has this shape:
+
+```php
+[
+    "ok" => true,
+    "source" => "nethernet",
+    "host" => "example.org",
+    "port" => 19132,
+    "data" => (object) [
+        "name" => "Example server",
+        "protocol" => 2225,
+        "version" => "1.26.60",
+        "level" => "world",
+        "players" => 3,
+        "maxPlayers" => 20,
+        // Optional metadata fields may be returned by the server.
+    ],
+]
+```
+
+The `data` object is the server's NetherNet status metadata. BedrockQuery currently performs only the `GET` capability/status request; it does not submit an SDP offer to join the server.
+
 ### Failed result
 
 When the final query fails, the callback has this shape:
@@ -116,7 +140,7 @@ When the final query fails, the callback has this shape:
 ```php
 [
     "ok" => false,
-    "source" => "api" or "udp",
+    "source" => "api", "nethernet" or "udp",
     "error" => "A human-readable error message",
 ]
 ```

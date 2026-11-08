@@ -1,15 +1,15 @@
 ---
 name: BedrockQuery
-version: 1.0.0
+version: 1.1.0
 api: 5.0.0
 main: NhanAZ\BedrockQuery\Main
 src-namespace-prefix: NhanAZ\BedrockQuery
 website: https://github.com/NhanAZ
-description: Query Bedrock server status through HTTP and UDP
+description: Query Bedrock server status through MCSRVSTAT, NetherNet and UDP
 commands:
   query:
     permission: bedrockquery.cmd
-    description: Querying server information (API v3 or direct query)
+    description: Querying server information (MCSRVSTAT, NetherNet or UDP)
     usage: "/query <domain/ip[:port]> [port] (e.g. /query test.pmmp.io 19132)"
     permission-message: §e>§c You do not have permission to use this command!
 

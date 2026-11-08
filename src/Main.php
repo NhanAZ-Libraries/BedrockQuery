@@ -63,7 +63,7 @@ final class Main extends PluginBase {
 			return true;
 		}
 
-		// If a port is provided separately, use direct PMQuery; otherwise use API v3 (async).
+		// If a port is provided separately, use NetherNet first and then legacy UDP; otherwise use API v3 (async).
 		if (isset($args[1])) {
 			$portText = $args[1];
 			if (!ctype_digit($portText) || (int) $portText < 1 || (int) $portText > 65535) {
@@ -74,7 +74,7 @@ final class Main extends PluginBase {
 			if ($addressHost !== null) {
 				$host = $addressHost;
 			}
-			$this->getServer()->getAsyncPool()->submitTask(new FallbackQueryTask($host, (int) $portText));
+			$this->getServer()->getAsyncPool()->submitTask(new NetherNetQueryTask($host, (int) $portText, $this->buildUserAgent()));
 			return true;
 		}
 
@@ -121,8 +121,8 @@ final class Main extends PluginBase {
 		$console->sendMessage(self::info("Primary API failed: " . $error));
 
 		if ($host !== null && $port !== null) {
-			$console->sendMessage(self::info("Using fallback UDP query..."));
-			Server::getInstance()->getAsyncPool()->submitTask(new FallbackQueryTask($host, $port, requestId: $requestId, debug: true));
+			$console->sendMessage(self::info("Using NetherNet query..."));
+			Server::getInstance()->getAsyncPool()->submitTask(new NetherNetQueryTask($host, $port, self::getInstance()->buildUserAgent(), requestId: $requestId));
 			return;
 		}
 
@@ -130,6 +130,68 @@ final class Main extends PluginBase {
 		$console->sendMessage(self::info("Try another query method using /query <domain> <port>"));
 		if ($requestId !== null) {
 			self::getInstance()->deliverCallback($requestId, ["ok" => false, "source" => "api", "error" => $error]);
+		}
+	}
+
+	public static function handleNetherNetResult(mixed $result): void {
+		$console = new ConsoleCommandSender(Server::getInstance(), Server::getInstance()->getLanguage());
+
+		if (!is_array($result)) {
+			$console->sendMessage(self::error("NetherNet query failed: Invalid result"));
+			return;
+		}
+
+		$requestId = is_int($result["requestId"] ?? null) ? $result["requestId"] : null;
+		$host = is_string($result["host"] ?? null) ? $result["host"] : null;
+		$port = is_int($result["port"] ?? null) ? $result["port"] : null;
+
+		if (($result["ok"] ?? false) !== true || !is_object($result["data"] ?? null)) {
+			$error = is_string($result["error"] ?? null) ? $result["error"] : "Unknown error";
+			if ($host !== null && $port !== null) {
+				$console->sendMessage(self::info("NetherNet query failed: " . $error));
+				$console->sendMessage(self::info("Using fallback UDP query..."));
+				Server::getInstance()->getAsyncPool()->submitTask(new FallbackQueryTask($host, $port, requestId: $requestId, debug: true));
+				return;
+			}
+			if ($requestId !== null) {
+				self::getInstance()->deliverCallback($requestId, ["ok" => false, "source" => "nethernet", "error" => $error]);
+			}
+			$console->sendMessage(self::error("NetherNet query failed: " . $error));
+			return;
+		}
+
+		/** @var object $data */
+		$data = $result["data"];
+		$payload = [
+			"ok" => true,
+			"source" => "nethernet",
+			"host" => $host ?? "unknown",
+			"port" => $port ?? 0,
+			"data" => $data
+		];
+
+		if ($requestId !== null && self::getInstance()->deliverCallback($requestId, $payload)) {
+			return;
+		}
+
+		$console->sendMessage(self::info("NetherNet query result (https://{$payload["host"]}:{$payload["port"]}/v1/join):"));
+		self::sendNetherNetStatus($console, $data);
+	}
+
+	private static function sendNetherNetStatus(CommandSender $sender, object $status): void {
+		$fields = [
+			"name" => "Name",
+			"protocol" => "Protocol",
+			"version" => "Version",
+			"level" => "Level",
+			"players" => "Online",
+			"maxPlayers" => "Max",
+			"gameType" => "GameType",
+			"dataVersion" => "DataVersion",
+			"transportLayer" => "TransportLayer"
+		];
+		foreach ($fields as $field => $label) {
+			self::sendField($sender, $label, self::getNestedValue($status, $field));
 		}
 	}
 

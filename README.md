@@ -1,6 +1,6 @@
 # BedrockQuery
 
-Query Bedrock server status from PocketMine-MP with HTTP and UDP
+Query Bedrock server status from PocketMine-MP with MCSRVSTAT, NetherNet and UDP
 
 [![CI](https://github.com/NhanAZ-Libraries/BedrockQuery/actions/workflows/build.yml/badge.svg)](https://github.com/NhanAZ-Libraries/BedrockQuery/actions/workflows/build.yml)
 [![Latest release](https://img.shields.io/github/v/release/NhanAZ-Libraries/BedrockQuery)](https://github.com/NhanAZ-Libraries/BedrockQuery/releases/latest)
@@ -12,6 +12,8 @@ Query Bedrock server status from PocketMine-MP with HTTP and UDP
 
 - `plugin.yml` declares PocketMine-MP API `5.0.0` and the code requires PHP 8.1 or newer.
 - Static analysis targets Axolotl-PM 5 API. Runtime compatibility across the 5.x line has not yet been established. See the [build workflow](.github/workflows/build.yml) for the exact revision tested in CI.
+- The NetherNet status probe uses the server's `GET /v1/join` signaling endpoint. It reads server metadata only; it does not perform the WebRTC/SDP connection handshake.
+- HTTPS is attempted first for NetherNet, with plain HTTP as a compatibility fallback. HTTPS is recommended for public deployments.
 - Plugins calling the API must depend on the `BedrockQuery` plugin so its instance is loaded first.
 
 ## Install and use
@@ -24,7 +26,7 @@ Download a verified PHAR from [GitHub Releases](https://github.com/NhanAZ-Librar
 /query example.org 19132
 ```
 
-The first form uses the HTTP status API and falls back to UDP if the API fails or reports the server offline. The other two forms use UDP directly. Query results depend on the remote server's query settings and network access.
+The first two forms use the MCSRVSTAT HTTP status API. If that request fails or reports the server offline, BedrockQuery tries the NetherNet `GET /v1/join` endpoint and then falls back to legacy RakNet UDP. The form with a separate port starts with NetherNet and falls back to UDP. Query results depend on the remote server's endpoint availability, query settings and network access.
 
 Another plugin can depend on `BedrockQuery` and call its API after both plugins load:
 
@@ -37,12 +39,12 @@ Main::getInstance()->getApi()->query("example.org", null, function (array $resul
         return;
     }
 
-    // $result["source"] identifies "udp" or "api".
-    // $result["data"] is a UDP array or HTTP status object.
+    // $result["source"] identifies "api", "nethernet" or "udp".
+    // $result["data"] is an HTTP/NetherNet object or a UDP array.
 });
 ```
 
-See the [API documentation](docs/api.md) for transport selection and callback payloads. The [example consumer guide](examples/QueryConsumer/README.md) explains the complete sample plugin. Its `/qtest [host] [port]` command accepts a separate host and UDP port for local testing. Without arguments, it uses the public test server. A callback is delivered once after success or the final failure. Keep the callback lightweight because it runs when the asynchronous task completes on the server thread.
+See the [API documentation](docs/api.md) for transport selection and callback payloads. The [example consumer guide](examples/QueryConsumer/README.md) explains the complete sample plugin. Its `/qtest [host] [port]` command accepts a separate host and Bedrock port for local testing. Without arguments, it uses the public test server. A callback is delivered once after success or the final failure. Keep the callback lightweight because it runs when the asynchronous task completes on the server thread.
 
 The public API currently depends on a loaded plugin instance, so the source should not be presented as a standalone virion. No current standalone virion release is offered.
 

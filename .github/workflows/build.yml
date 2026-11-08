@@ -73,7 +73,7 @@ jobs:
         run: |
           set -euo pipefail
           test "$(sha256sum "$PHAR_PATH" | cut -d ' ' -f 1)" = "$PHAR_SHA256"
-          php -r '$p=new Phar(getenv("PHAR_PATH")); foreach(["plugin.yml","LICENSE","resources/licenses/libpmquery-LICENSE.txt","src/Main.php","src/API.php","src/libpmquery/PMQuery.php"] as $f){if(!$p->offsetExists($f)){throw new RuntimeException("Missing PHAR entry: ".$f);}}'
+          php -r '$p=new Phar(getenv("PHAR_PATH")); foreach(["plugin.yml","LICENSE","resources/licenses/libpmquery-LICENSE.txt","src/Main.php","src/API.php","src/NetherNetQueryTask.php","src/libpmquery/PMQuery.php"] as $f){if(!$p->offsetExists($f)){throw new RuntimeException("Missing PHAR entry: ".$f);}}'
           cp "$BUILD_METADATA" build/build-metadata.json
 
       - name: Analyze and build example consumer with pinned DevTools

@@ -37,7 +37,7 @@ final class API {
 		$requestId = $this->plugin->registerCallback($onComplete);
 
 		if ($resolvedPort !== null) {
-			$this->plugin->getServer()->getAsyncPool()->submitTask(new FallbackQueryTask($resolvedHost ?? $host, $resolvedPort, timeout: 2, requestId: $requestId));
+			$this->plugin->getServer()->getAsyncPool()->submitTask(new NetherNetQueryTask($resolvedHost ?? $host, $resolvedPort, $this->plugin->buildUserAgent(), requestId: $requestId));
 			return;
 		}
 

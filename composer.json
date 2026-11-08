@@ -1,6 +1,6 @@
 {
   "name": "nhanaz-libraries/bedrockquery",
-  "description": "PocketMine-MP plugin for querying Bedrock server status through HTTP and UDP",
+  "description": "PocketMine-MP plugin for querying Bedrock server status through MCSRVSTAT, NetherNet and UDP",
   "type": "project",
   "license": "GPL-3.0-only",
   "require": {

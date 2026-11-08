@@ -73,7 +73,11 @@ final class Main extends PluginBase {
 			return;
 		}
 		if (is_object($data)) {
-			$this->sendApiResult($sender, $data);
+			if (($result["source"] ?? null) === "nethernet") {
+				$this->sendNetherNetResult($sender, $data);
+			} else {
+				$this->sendApiResult($sender, $data);
+			}
 
 			return;
 		}
@@ -115,5 +119,26 @@ final class Main extends PluginBase {
 		}
 
 		$sender->sendMessage("HTTP data was received, but common server fields were unavailable.");
+	}
+
+	private function sendNetherNetResult(CommandSender $sender, object $data): void {
+		$fields = get_object_vars($data);
+		$name = $fields["name"] ?? null;
+		$version = $fields["version"] ?? null;
+		$players = $fields["players"] ?? null;
+		$maxPlayers = $fields["maxPlayers"] ?? null;
+		$level = $fields["level"] ?? null;
+		if (is_string($name) && is_string($version) && is_int($players) && is_int($maxPlayers)) {
+			$sender->sendMessage("Name: {$name}");
+			$sender->sendMessage("Version: {$version}");
+			$sender->sendMessage("Players: {$players}/{$maxPlayers}");
+			if (is_string($level)) {
+				$sender->sendMessage("Level: {$level}");
+			}
+
+			return;
+		}
+
+		$sender->sendMessage("NetherNet data was received, but common server fields were unavailable.");
 	}
 }

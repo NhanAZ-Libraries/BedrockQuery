@@ -1,8 +1,8 @@
 name: BedrockQueryCore
 antigen: NhanAZ\\BedrockQuery
 api: 5.0.0
-version: 0.0.3
+version: 0.0.4
 authors:
   - NhanAZ
-description: Core library for async server querying (HTTP v3 + UDP fallback)
+description: Core library for async server querying (MCSRVSTAT, NetherNet + UDP fallback)
 license: GPL-3.0-only

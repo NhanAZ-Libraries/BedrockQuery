@@ -24,14 +24,14 @@ Download a verified PHAR from [GitHub Releases](https://github.com/NhanAZ-Librar
 /query example.org 19132
 ```
 
-The first two forms try the HTTP status API, then UDP if the API fails or reports the server offline. The third form uses UDP directly. Query results depend on the remote server's query settings and network access.
+The first form uses the HTTP status API and falls back to UDP if the API fails or reports the server offline. The other two forms use UDP directly. Query results depend on the remote server's query settings and network access.
 
 Another plugin can depend on `BedrockQuery` and call its API after both plugins load:
 
 ```php
 use NhanAZ\BedrockQuery\Main;
 
-Main::getInstance()->getApi()->query("example.org", 19132, function (array $result): void {
+Main::getInstance()->getApi()->query("example.org", null, function (array $result): void {
     if (($result["ok"] ?? false) !== true) {
         // Inspect $result["error"].
         return;
@@ -42,7 +42,7 @@ Main::getInstance()->getApi()->query("example.org", 19132, function (array $resu
 });
 ```
 
-The [example consumer](examples/QueryConsumer) shows plugin dependency and command wiring. Its `/qtest [host] [port]` command accepts a separate host and UDP port for local testing. Without arguments, it uses the public test server. A callback is delivered once after success or the final failure. Keep the callback lightweight because it runs when the asynchronous task completes on the server thread.
+See the [API documentation](docs/api.md) for transport selection and callback payloads. The [example consumer guide](examples/QueryConsumer/README.md) explains the complete sample plugin. Its `/qtest [host] [port]` command accepts a separate host and UDP port for local testing. Without arguments, it uses the public test server. A callback is delivered once after success or the final failure. Keep the callback lightweight because it runs when the asynchronous task completes on the server thread.
 
 ## Build and verify
 

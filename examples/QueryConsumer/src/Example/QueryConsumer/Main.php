@@ -40,13 +40,13 @@ final class Main extends PluginBase {
 	}
 
 	/**
-	 * @param list<string> $args
+	 * @param array<string> $args
 	 * @return array{host: string, port: int}|null
 	 */
 	private function parseTarget(array $args): ?array {
 		$host = $args[0] ?? "test.pmmp.io";
 		$portText = $args[1] ?? "19132";
-		if (!is_string($host) || !is_string($portText) || $host === "" || !ctype_digit($portText) || (int) $portText < 1 || (int) $portText > 65535) {
+		if ($host === "" || !ctype_digit($portText) || (int) $portText < 1 || (int) $portText > 65535) {
 			return null;
 		}
 
@@ -66,7 +66,9 @@ final class Main extends PluginBase {
 		$sender->sendMessage("Source: " . (is_string($source) ? $source : "unknown"));
 		$data = $result["data"] ?? null;
 		if (is_array($data)) {
-			$this->sendUdpResult($sender, $data);
+			/** @var array<string, mixed> $udpData */
+			$udpData = $data;
+			$this->sendUdpResult($sender, $udpData);
 
 			return;
 		}

@@ -44,10 +44,6 @@ Main::getInstance()->getApi()->query("example.org", null, function (array $resul
 
 See the [API documentation](docs/api.md) for transport selection and callback payloads. The [example consumer guide](examples/QueryConsumer/README.md) explains the complete sample plugin. Its `/qtest [host] [port]` command accepts a separate host and UDP port for local testing. Without arguments, it uses the public test server. A callback is delivered once after success or the final failure. Keep the callback lightweight because it runs when the asynchronous task completes on the server thread.
 
-## Build and verify
-
-The [build workflow](.github/workflows/build.yml) runs PHPStan at maximum level, PHP lint, callback and loopback UDP fixtures, and DevTools PHAR builds for both the plugin and its example consumer. It verifies PHAR contents and SHA-256 digests before uploading the plugin artifact. The UDP fixture checks ping parsing and malformed replies against a local responder. It does not establish reachability of public servers. A CI artifact is a test result, not a stable release.
-
 The public API currently depends on a loaded plugin instance, so the source should not be presented as a standalone virion. No current standalone virion release is offered.
 
 ## License and upstream

@@ -55,9 +55,9 @@ jobs:
         shell: bash
         run: find src examples tests -name '*.php' -print0 | xargs -0 -n1 php -l
 
-      - name: Analyze and build with pinned DevTools
+      - name: Analyze and build with latest DevTools
         id: build
-        uses: AxolotlBucketLabs/DevTools@v3 # v3.0.0
+        uses: AxolotlBucketLabs/DevTools@latest
         with:
           project: .
           output: build
@@ -76,9 +76,9 @@ jobs:
           php -r '$p=new Phar(getenv("PHAR_PATH")); foreach(["plugin.yml","LICENSE","resources/licenses/libpmquery-LICENSE.txt","src/Main.php","src/API.php","src/NetherNetQueryTask.php","src/libpmquery/PMQuery.php"] as $f){if(!$p->offsetExists($f)){throw new RuntimeException("Missing PHAR entry: ".$f);}}'
           cp "$BUILD_METADATA" build/build-metadata.json
 
-      - name: Analyze and build example consumer with pinned DevTools
+      - name: Analyze and build example consumer with latest DevTools
         id: consumer
-        uses: AxolotlBucketLabs/DevTools@v3 # v3.0.0
+        uses: AxolotlBucketLabs/DevTools@latest
         with:
           project: examples/QueryConsumer
           output: build/consumer

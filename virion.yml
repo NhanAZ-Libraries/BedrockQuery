@@ -1,5 +1,5 @@
 name: BedrockQueryCore
-antigen: NhanAZ\\BedrockQuery
+antigen: NhanAZ\BedrockQuery
 api: 5.0.0
 version: 0.0.4
 authors:
